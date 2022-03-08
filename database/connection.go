@@ -2,6 +2,7 @@ package database
 
 import (
 	"Minerva/config"
+	"Minerva/database/model"
 	"fmt"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -34,7 +35,8 @@ func ConnectDB() {
 	fmt.Println("Connection Opened to Database")
 
 	// Migrate the database
-	//DB.AutoMigrate(&model.User{})
-	//DB.AutoMigrate(&model.Member{})
+	DB.AutoMigrate(&model.Book{})
+	DB.AutoMigrate(&model.User{})
+	DB.AutoMigrate(&model.Member{})
 	fmt.Println("Database Migrated")
 }

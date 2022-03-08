@@ -9,7 +9,6 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
-	"log"
 	"time"
 )
 
@@ -40,11 +39,11 @@ func Login(request *fiber.Ctx) error {
 	password := request.FormValue("Password")
 	db.Preload("IdMember").Find(&userGet, "username = ?", username)
 	if userGet.ID == uuid.Nil {
-		return request.Status(404).JSON(fiber.Map{"status": "error", "message": "user not found", "data": userGet})
+		return request.Status(404).JSON(fiber.Map{"status": "error", "message": "user or password wrong", "data": userGet})
 	}
 	err := bcrypt.CompareHashAndPassword(userGet.Hash, []byte(password))
 	if err != nil {
-		log.Println(err)
+		return request.JSON(fiber.Map{"status": "success", "message": "Error Hash Compare", "data": err})
 	} else {
 		var admin bool
 		if userGet.IdMember.Role == "regular" {
@@ -68,7 +67,6 @@ func Login(request *fiber.Ctx) error {
 
 		return request.JSON(fiber.Map{"token": t})
 	}
-	return request.JSON(fiber.Map{"status": "success", "message": "User ditemukan", "data": userGet})
 }
 
 func AllUser(request *fiber.Ctx) error {
