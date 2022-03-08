@@ -7,19 +7,6 @@ import (
 	"os"
 )
 
-func cekPass() {
-	//hash1, _ := bcrypt.GenerateFromPassword([]byte("Udin Gamboet"), bcrypt.DefaultCost)
-	//fmt.Println(hash1)
-	//fmt.Println(reflect.TypeOf(hash1))
-	//
-	//err := bcrypt.CompareHashAndPassword(hash1, []byte("Udin Gamboet"))
-	//if err != nil {
-	//	log.Println(err)
-	//} else {
-	//	log.Println("success")
-	//}
-}
-
 func main() {
 	// Start a new fiber app
 	app := fiber.New()

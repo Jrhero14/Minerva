@@ -70,15 +70,11 @@ func Login(request *fiber.Ctx) error {
 }
 
 func AllUser(request *fiber.Ctx) error {
-	user := request.Locals("user").(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
-	name := claims["name"].(string)
-	fmt.Println(name)
 	db := database.DB
 	var users []model.User
 	db.Preload("IdMember").Find(&users)
 	if len(users) == 0 {
-		request.Status(404).JSON(fiber.Map{"status": "error", "message": "Tidak ada user", "data": users})
+		return request.Status(404).JSON(fiber.Map{"status": "error", "message": "Tidak ada user", "data": users})
 	}
 	return request.JSON(fiber.Map{"status": "success", "message": "User ditemukan", "data": users})
 }

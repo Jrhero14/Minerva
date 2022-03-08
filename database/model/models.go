@@ -86,7 +86,7 @@ type InfoDetail struct {
 type Kategori struct {
 	gorm.Model
 	ID           int32 `gorm:"primary_key:auto_increment"`
-	namaKategori string
+	NamaKategori string
 }
 
 type Book struct {
