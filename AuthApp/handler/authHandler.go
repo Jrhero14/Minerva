@@ -119,11 +119,32 @@ func CreateUser(request *fiber.Ctx) error {
 	user := new(model.User)
 	member := new(model.Member)
 
-	user.ID = uuid.New()
-	member.ID = uuid.New()
+	userUUID := uuid.New()
+	memberUUID := uuid.New()
+
+	var favoriteBody model.Favorite
+	favoriteBody.Id_Member = memberUUID
+	err := db.Create(&favoriteBody).Error
+	if err != nil {
+		return request.Status(500).JSON(fiber.Map{"status": "error", "message": "Favorite Create Failed", "data": err})
+	}
+
+	var historyBody model.HistoryBorrow
+	historyBody.IDMember = memberUUID
+	err = db.Create(&historyBody).Error
+	if err != nil {
+		return request.Status(500).JSON(fiber.Map{"status": "error", "message": "History Create Failed", "data": err})
+	}
+
+	user.ID = userUUID
+	member.ID = memberUUID
 	member.Regis_date = time.Now()
 	member.Exp_member = time.Now().AddDate(2, 0, 0)
-	err := db.Create(&member).Error
+	member.Id_Favorite = favoriteBody.ID
+	member.IDFavorite = favoriteBody
+	member.Id_HistoryBorrow = historyBody.ID
+	member.IDHistory = historyBody
+	err = db.Create(&member).Error
 	if err != nil {
 		return request.Status(500).JSON(fiber.Map{"status": "error", "message": "Member Create Failed", "data": err})
 	}

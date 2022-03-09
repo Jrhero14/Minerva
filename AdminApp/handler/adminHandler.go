@@ -40,3 +40,27 @@ func GetAllCategory(request *fiber.Ctx) error {
 	}
 	return request.Status(200).JSON(fiber.Map{"status": "success", "message": "Kategori ditemukan", "data": categories})
 }
+
+func CreateJenis(request *fiber.Ctx) error {
+	db := database.DB
+	newJenis := new(model.Jenis)
+	err := request.BodyParser(&newJenis)
+	if err != nil {
+		return request.Status(400).JSON(fiber.Map{"status": "error", "message": "Data input salah, periksa kembali", "data": err})
+	}
+	err = db.Create(&newJenis).Error
+	if err != nil {
+		return request.Status(500).JSON(fiber.Map{"status": "error", "message": "Tidak bisa membuat Jenis baru", "data": err})
+	}
+	return request.Status(200).JSON(fiber.Map{"status": "success", "message": "Berhasil membuat jenis baru", "data": newJenis})
+}
+
+func GetAllJenis(request *fiber.Ctx) error {
+	db := database.DB
+	var allJenis []model.Jenis
+	db.Find(&allJenis)
+	if len(allJenis) == 0 {
+		return request.Status(404).JSON(fiber.Map{"status": "not found", "data": allJenis})
+	}
+	return request.Status(200).JSON(fiber.Map{"status": "success", "message": "Data ditemukan", "data": allJenis})
+}

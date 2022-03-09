@@ -18,4 +18,8 @@ func SetupNoteRoutes(router fiber.Router) {
 	admin.Post("/new-category", adminHandler.CreateCategory)
 	// All Category
 	admin.Get("/all-category", adminHandler.GetAllCategory)
+	// Create Jenis
+	admin.Post("/create-jenis", adminHandler.CreateJenis)
+	// Get All Jenis
+	admin.Get("/all-jenis", adminHandler.GetAllJenis)
 }

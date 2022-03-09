@@ -30,11 +30,11 @@ type Member struct {
 	Email            string
 	Phone            string
 	Role             string
-	Id_Favorite      int64
-	IDFavorite       Favorite `gorm:"foreignkey:Id_Favorite;constraint:onUpdate:CASCADE,ondelete:SET NULL" json:"Favorite"`
-	Id_HistoryBorrow int64
+	Id_Favorite      int64         `gorm:"default:null"`
+	IDFavorite       Favorite      `gorm:"foreignkey:Id_Favorite;constraint:onUpdate:CASCADE,ondelete:SET NULL" json:"Favorite"`
+	Id_HistoryBorrow int64         `gorm:"default:null"`
 	IDHistory        HistoryBorrow `gorm:"foreignkey:Id_HistoryBorrow;constraint:onUpdate:CASCADE,ondelete:SET NULL" json:"History"`
-	Id_Mylist        int64
+	Id_Mylist        int64         `gorm:"default:null"`
 }
 
 type Mylist struct {
@@ -63,15 +63,15 @@ type Favorite struct {
 type Jenis struct {
 	gorm.Model
 	ID        int `gorm:"primary_key:auto_increment"`
-	namaJenis string
+	NamaJenis string
 }
 
 type RakBuku struct {
 	gorm.Model
 	ID       int32 `gorm:"primary_key:auto_increment"`
-	namaRak  string
-	nomorRak string
-	note     string `gorm:"type:text"`
+	NamaRak  string
+	NomorRak string
+	Note     string `gorm:"type:text"`
 }
 
 type InfoDetail struct {
