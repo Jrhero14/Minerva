@@ -22,4 +22,8 @@ func SetupNoteRoutes(router fiber.Router) {
 	admin.Post("/create-jenis", adminHandler.CreateJenis)
 	// Get All Jenis
 	admin.Get("/all-jenis", adminHandler.GetAllJenis)
+	// Create Rak Buku
+	admin.Post("/create-rak", adminHandler.CreateRak)
+	// Get All Rak buku
+	admin.Get("/all-rak", adminHandler.GetAllRak)
 }

@@ -32,6 +32,16 @@ type User struct {
 	Username string
 }
 
+func CekRole(request *fiber.Ctx) bool {
+	user := request.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	if claims["admin"].(bool) {
+		return true
+	} else {
+		return false
+	}
+}
+
 func Login(request *fiber.Ctx) error {
 	db := database.DB
 	userGet := new(model.User)
@@ -39,14 +49,14 @@ func Login(request *fiber.Ctx) error {
 	password := request.FormValue("Password")
 	db.Preload("IdMember").Find(&userGet, "username = ?", username)
 	if userGet.ID == uuid.Nil {
-		return request.Status(404).JSON(fiber.Map{"status": "error", "message": "user or password wrong", "data": userGet})
+		return request.Status(404).JSON(fiber.Map{"status": "Not Found", "message": "user or password wrong"})
 	}
 	err := bcrypt.CompareHashAndPassword(userGet.Hash, []byte(password))
 	if err != nil {
 		return request.JSON(fiber.Map{"status": "success", "message": "Error Hash Compare", "data": err})
 	} else {
 		var admin bool
-		if userGet.IdMember.Role == "regular" {
+		if userGet.Role == "User" {
 			admin = false
 		} else {
 			admin = true
@@ -65,11 +75,16 @@ func Login(request *fiber.Ctx) error {
 			return request.SendStatus(fiber.StatusInternalServerError)
 		}
 
-		return request.JSON(fiber.Map{"token": t})
+		request.Set("idUser", userGet.ID.String())
+		request.Set("token", t)
+		return request.Status(200).JSON(fiber.Map{"Message": "Success Login"})
 	}
 }
 
 func AllUser(request *fiber.Ctx) error {
+	if !CekRole(request) {
+		return request.Status(403).JSON(fiber.Map{"status": "Forbidden", "message": "Hanya Admin atau Manager yang bisa melihat semua user"})
+	}
 	db := database.DB
 	var users []model.User
 	db.Preload("IdMember").Find(&users)
@@ -82,10 +97,13 @@ func AllUser(request *fiber.Ctx) error {
 func GetinfoMember(request *fiber.Ctx) error {
 	db := database.DB
 	var memberInfo model.Member
-	db.Find(&memberInfo, "id = ?", request.FormValue("idMem"))
-	if memberInfo.ID == uuid.Nil {
-		request.Status(404).JSON(fiber.Map{"status": "error", "message": "Member Info not Found", "data": memberInfo})
+	var UserData model.User
+	idUser := request.Get("idUser")
+	db.Preload("IdMember").Find(&UserData, "id = ?", idUser)
+	if UserData.ID == uuid.Nil {
+		request.Status(404).JSON(fiber.Map{"status": "error", "message": "User not Found", "data": UserData})
 	}
+	db.Find(&memberInfo, "id = ?", UserData.IdMember.ID)
 	memberInfoSchema := struct {
 		Nama      string
 		BirthDay  string
@@ -95,7 +113,6 @@ func GetinfoMember(request *fiber.Ctx) error {
 		KodePos   string
 		Email     string
 		Phone     string
-		Role      string
 	}{
 		Nama:      memberInfo.Nama,
 		BirthDay:  memberInfo.BirthDay.Format("2006-01-02"),
@@ -105,7 +122,6 @@ func GetinfoMember(request *fiber.Ctx) error {
 		KodePos:   memberInfo.KodePos,
 		Email:     memberInfo.Email,
 		Phone:     memberInfo.Phone,
-		Role:      memberInfo.Role,
 	}
 	return request.JSON(fiber.Map{
 		"status":  "success",
@@ -151,6 +167,13 @@ func CreateUser(request *fiber.Ctx) error {
 
 	user.IdMem = member.ID
 	user.Username = request.FormValue("username")
+	if i := request.FormValue("role"); i == "1" {
+		user.Role = "User"
+	} else if i == "2" {
+		user.Role = "Admin"
+	} else {
+		user.Role = "Manager"
+	}
 	hash, _ := bcrypt.GenerateFromPassword([]byte(request.FormValue("password")), bcrypt.DefaultCost)
 	user.Hash = hash
 	err = db.Create(&user).Error
@@ -171,7 +194,8 @@ func UpdateMember(request *fiber.Ctx) error {
 	if err != nil {
 		return request.Status(500).JSON(fiber.Map{"status": "error", "message": "Review your input", "data": err})
 	}
-	db.Find(&member, "id = ?", memberBody.ID)
+	idUser := request.Get("idUser")
+	db.Find(&member, "id = ?", idUser)
 
 	t1, err := time.Parse("2006-01-02", memberBody.BirthDay)
 	if err != nil {
@@ -186,7 +210,6 @@ func UpdateMember(request *fiber.Ctx) error {
 	member.KodePos = memberBody.KodePos
 	member.Email = memberBody.Email
 	member.Phone = memberBody.Phone
-	member.Role = memberBody.Role
 
 	db.Save(&member)
 	// Return the updated note

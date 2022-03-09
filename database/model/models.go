@@ -14,6 +14,7 @@ type User struct {
 	IdMember Member    `gorm:"foreignkey:IdMem;constraint:onUpdate:CASCADE,ondelete:CASCADE" json:"member"`
 	Username string
 	Hash     []uint8
+	Role     string
 }
 
 type Member struct {
@@ -29,7 +30,6 @@ type Member struct {
 	KodePos          string
 	Email            string
 	Phone            string
-	Role             string
 	Id_Favorite      int64         `gorm:"default:null"`
 	IDFavorite       Favorite      `gorm:"foreignkey:Id_Favorite;constraint:onUpdate:CASCADE,ondelete:SET NULL" json:"Favorite"`
 	Id_HistoryBorrow int64         `gorm:"default:null"`
