@@ -32,6 +32,17 @@ type User struct {
 	Username string
 }
 
+type authSchema struct {
+	Username string
+	Password string
+}
+
+type regSchema struct {
+	Username string
+	Password string
+	Role     string
+}
+
 func CekRole(request *fiber.Ctx) bool {
 	user := request.Locals("user").(*jwt.Token)
 	claims := user.Claims.(jwt.MapClaims)
@@ -45,13 +56,18 @@ func CekRole(request *fiber.Ctx) bool {
 func Login(request *fiber.Ctx) error {
 	db := database.DB
 	userGet := new(model.User)
-	username := request.FormValue("Username")
-	password := request.FormValue("Password")
+	loginBody := new(authSchema)
+	err := request.BodyParser(&loginBody)
+	if err != nil {
+		return request.Status(500).JSON(fiber.Map{"status": "error", "message": "Review your input", "data": err})
+	}
+	username := loginBody.Username
+	password := loginBody.Password
 	db.Preload("IdMember").Find(&userGet, "username = ?", username)
 	if userGet.ID == uuid.Nil {
 		return request.Status(404).JSON(fiber.Map{"status": "Not Found", "message": "user or password wrong"})
 	}
-	err := bcrypt.CompareHashAndPassword(userGet.Hash, []byte(password))
+	err = bcrypt.CompareHashAndPassword(userGet.Hash, []byte(password))
 	if err != nil {
 		return request.JSON(fiber.Map{"status": "success", "message": "Error Hash Compare", "data": err})
 	} else {
@@ -62,6 +78,7 @@ func Login(request *fiber.Ctx) error {
 			admin = true
 		}
 		claims := jwt.MapClaims{
+			"id":    userGet.ID,
 			"name":  userGet.Username,
 			"email": userGet.IdMember.Email,
 			"admin": admin,
@@ -75,7 +92,6 @@ func Login(request *fiber.Ctx) error {
 			return request.SendStatus(fiber.StatusInternalServerError)
 		}
 
-		request.Set("idUser", userGet.ID.String())
 		request.Set("token", t)
 		return request.Status(200).JSON(fiber.Map{"Message": "Success Login"})
 	}
@@ -98,10 +114,11 @@ func GetinfoMember(request *fiber.Ctx) error {
 	db := database.DB
 	var memberInfo model.Member
 	var UserData model.User
-	idUser := request.Get("idUser")
-	db.Preload("IdMember").Find(&UserData, "id = ?", idUser)
+	user := request.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	db.Preload("IdMember").Find(&UserData, "id = ?", claims["id"].(string))
 	if UserData.ID == uuid.Nil {
-		request.Status(404).JSON(fiber.Map{"status": "error", "message": "User not Found", "data": UserData})
+		return request.Status(404).JSON(fiber.Map{"status": "error", "message": "User not Found"})
 	}
 	db.Find(&memberInfo, "id = ?", UserData.IdMember.ID)
 	memberInfoSchema := struct {
@@ -134,13 +151,19 @@ func CreateUser(request *fiber.Ctx) error {
 	db := database.DB
 	user := new(model.User)
 	member := new(model.Member)
+	bodyUser := new(regSchema)
+
+	err := request.BodyParser(&bodyUser)
+	if err != nil {
+		return request.Status(500).JSON(fiber.Map{"status": "error", "message": "Review your input", "data": err})
+	}
 
 	userUUID := uuid.New()
 	memberUUID := uuid.New()
 
 	var favoriteBody model.Favorite
 	favoriteBody.Id_Member = memberUUID
-	err := db.Create(&favoriteBody).Error
+	err = db.Create(&favoriteBody).Error
 	if err != nil {
 		return request.Status(500).JSON(fiber.Map{"status": "error", "message": "Favorite Create Failed", "data": err})
 	}
@@ -166,15 +189,16 @@ func CreateUser(request *fiber.Ctx) error {
 	}
 
 	user.IdMem = member.ID
-	user.Username = request.FormValue("username")
-	if i := request.FormValue("role"); i == "1" {
+	user.Username = bodyUser.Username
+	fmt.Println(bodyUser.Role)
+	if i := bodyUser.Role; i == "1" {
 		user.Role = "User"
 	} else if i == "2" {
 		user.Role = "Admin"
 	} else {
 		user.Role = "Manager"
 	}
-	hash, _ := bcrypt.GenerateFromPassword([]byte(request.FormValue("password")), bcrypt.DefaultCost)
+	hash, _ := bcrypt.GenerateFromPassword([]byte(bodyUser.Password), bcrypt.DefaultCost)
 	user.Hash = hash
 	err = db.Create(&user).Error
 	if err != nil {
@@ -188,14 +212,19 @@ func CreateUser(request *fiber.Ctx) error {
 func UpdateMember(request *fiber.Ctx) error {
 	db := database.DB
 	var member model.Member
+	var userMember model.User
 
 	memberBody := new(memberValueRegis)
 	err := request.BodyParser(&memberBody)
 	if err != nil {
 		return request.Status(500).JSON(fiber.Map{"status": "error", "message": "Review your input", "data": err})
 	}
-	idUser := request.Get("idUser")
-	db.Find(&member, "id = ?", idUser)
+
+	user := request.Locals("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	idUser := claims["id"].(string)
+	db.Preload("IdMember").Find(&userMember, "id = ?", idUser)
+	db.Find(&member, "id = ?", userMember.IdMem)
 
 	t1, err := time.Parse("2006-01-02", memberBody.BirthDay)
 	if err != nil {
