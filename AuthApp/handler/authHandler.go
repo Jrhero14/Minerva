@@ -1,6 +1,7 @@
 package handler
 
 import (
+	schemas "Minerva/AuthApp/schemas"
 	"Minerva/config"
 	"Minerva/database"
 	"Minerva/database/model"
@@ -11,37 +12,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"time"
 )
-
-type memberValueRegis struct {
-	ID        string
-	Nama      string
-	BirthDay  string
-	Institusi string
-	Gender    string
-	Alamat    string
-	KodePos   string
-	Email     string
-	Phone     string
-	Role      string
-}
-
-type User struct {
-	ID       uuid.UUID
-	IdMem    uuid.UUID
-	IdMember memberValueRegis
-	Username string
-}
-
-type authSchema struct {
-	Username string
-	Password string
-}
-
-type regSchema struct {
-	Username string
-	Password string
-	Role     string
-}
 
 func CekRole(request *fiber.Ctx) bool {
 	user := request.Locals("user").(*jwt.Token)
@@ -56,7 +26,7 @@ func CekRole(request *fiber.Ctx) bool {
 func Login(request *fiber.Ctx) error {
 	db := database.DB
 	userGet := new(model.User)
-	loginBody := new(authSchema)
+	loginBody := new(schemas.AuthSchema)
 	err := request.BodyParser(&loginBody)
 	if err != nil {
 		return request.Status(500).JSON(fiber.Map{"status": "error", "message": "Review your input", "data": err})
@@ -151,7 +121,7 @@ func CreateUser(request *fiber.Ctx) error {
 	db := database.DB
 	user := new(model.User)
 	member := new(model.Member)
-	bodyUser := new(regSchema)
+	bodyUser := new(schemas.RegSchema)
 
 	err := request.BodyParser(&bodyUser)
 	if err != nil {
@@ -214,7 +184,7 @@ func UpdateMember(request *fiber.Ctx) error {
 	var member model.Member
 	var userMember model.User
 
-	memberBody := new(memberValueRegis)
+	memberBody := new(schemas.MemberValueRegis)
 	err := request.BodyParser(&memberBody)
 	if err != nil {
 		return request.Status(500).JSON(fiber.Map{"status": "error", "message": "Review your input", "data": err})
