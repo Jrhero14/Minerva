@@ -80,6 +80,7 @@ type InfoDetail struct {
 	Id_Book   int64
 	NomorBuku string
 	Id_Rak    int
+	Ready     bool
 	IDRak     RakBuku `gorm:"foreignkey:Id_Rak;constraint:onUpdate:CASCADE,ondelete:SET NULL" json:"RakBuku"`
 }
 
@@ -91,24 +92,22 @@ type Kategori struct {
 
 type Book struct {
 	gorm.Model
-	ID            int64 `gorm:"primary_key:auto_increment"`
-	Image         string
-	Title         string
-	JudulSeri     string
-	Penerbit      string
-	Deskripsi     string `gorm:"type:date"`
-	Id_Jenis      int
-	IDJenis       Jenis `gorm:"foreignkey:Id_Jenis;constraint:onUpdate:CASCADE,ondelete:CASCADE" json:"Jenis"`
-	Bahasa        string
-	ISBN          string
-	Edisi         string
-	Ketersediaan  bool
-	Stock         int32
-	Subjek        string
-	Id_InfoDetail int32
-	IDInfoDetail  InfoDetail `gorm:"foreignkey:Id_InfoDetail;constraint:onUpdate:CASCADE,ondelete:SET NULL" json:"InfoDetail"`
-	Id_Kategori   int32
-	IDKategori    Kategori `gorm:"foreignkey:Id_Kategori;constraint:onUpdate:CASCADE,ondelete:SET NULL" json:"Kategori"`
+	ID           int64 `gorm:"primary_key:auto_increment"`
+	Image        string
+	Title        string
+	JudulSeri    string
+	Penerbit     string
+	Deskripsi    string `gorm:"type:date"`
+	Id_Jenis     int
+	IDJenis      Jenis `gorm:"foreignkey:Id_Jenis;constraint:onUpdate:CASCADE,ondelete:CASCADE" json:"Jenis"`
+	Bahasa       string
+	ISBN         string
+	Edisi        string
+	Ketersediaan bool
+	Stock        int32
+	Subjek       string
+	Id_Kategori  int32
+	IDKategori   Kategori `gorm:"foreignkey:Id_Kategori;constraint:onUpdate:CASCADE,ondelete:SET NULL" json:"Kategori"`
 }
 
 // Borrow Entity

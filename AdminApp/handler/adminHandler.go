@@ -1,6 +1,7 @@
 package handler
 
 import (
+	schemas "Minerva/AdminApp/schemas"
 	auth "Minerva/AuthApp/handler"
 	"Minerva/database"
 	"Minerva/database/model"
@@ -97,4 +98,45 @@ func GetAllRak(request *fiber.Ctx) error {
 		return request.Status(404).JSON(fiber.Map{"status": "error", "message": "Not Found Rak Buku", "data": allRak})
 	}
 	return request.Status(200).JSON(fiber.Map{"status": "success", "message": "Rak Buku found", "data": allRak})
+}
+
+func CreateNewBook(request *fiber.Ctx) error {
+	db := database.DB
+	BookNew := new(model.Book)
+	bodyBook := new(schemas.BookBody)
+	var jenis model.Jenis
+	var kategory model.Kategori
+	err := request.BodyParser(&bodyBook)
+	if err != nil {
+		return request.Status(400).JSON(fiber.Map{"status": "error", "messsage": "review your input"})
+	}
+	err = db.Find(&jenis, "id = ?", bodyBook.IdJenis).Error
+	if err != nil {
+		return request.Status(500).JSON(fiber.Map{"status": "error", "messsage": "Can't find jenis"})
+	}
+	err = db.Find(&kategory, "id = ?", bodyBook.IdKategori).Error
+	if err != nil {
+		return request.Status(500).JSON(fiber.Map{"status": "error", "messsage": "Can't find kategori"})
+	}
+	BookNew.Image = bodyBook.Image
+	BookNew.Title = bodyBook.Title
+	BookNew.JudulSeri = bodyBook.JudulSeri
+	BookNew.Penerbit = bodyBook.Penerbit
+	BookNew.Deskripsi = bodyBook.Deskripsi
+	BookNew.Id_Jenis = bodyBook.IdJenis
+	BookNew.IDJenis = jenis
+	BookNew.Bahasa = bodyBook.Bahasa
+	BookNew.ISBN = bodyBook.ISBN
+	BookNew.Edisi = bodyBook.Edisi
+	BookNew.Subjek = bodyBook.Subjek
+	BookNew.Id_Kategori = bodyBook.IdKategori
+	BookNew.IDKategori = kategory
+	BookNew.Ketersediaan = false
+	BookNew.Stock = 0
+
+	err = db.Create(&BookNew).Error
+	if err != nil {
+		return request.Status(500).JSON(fiber.Map{"status": "error", "messsage": "Can't create new book"})
+	}
+	return request.Status(200).JSON(fiber.Map{"status": "success", "messsage": "Success Create Book", "data": BookNew})
 }

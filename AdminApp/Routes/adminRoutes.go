@@ -26,4 +26,6 @@ func SetupNoteRoutes(router fiber.Router) {
 	admin.Post("/create-rak", adminHandler.CreateRak)
 	// Get All Rak buku
 	admin.Get("/all-rak", adminHandler.GetAllRak)
+	// Create new Book
+	admin.Post("/create-book", adminHandler.CreateNewBook)
 }
