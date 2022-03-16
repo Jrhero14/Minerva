@@ -23,6 +23,37 @@ func CekRole(request *fiber.Ctx) bool {
 	}
 }
 
+func Refresh(request *fiber.Ctx) error {
+	cookie := request.Cookies("token")
+	var err error
+	token, err := jwt.Parse(cookie, func(token *jwt.Token) (interface{}, error) {
+		return []byte(config.Config("SECRET")), nil
+	})
+	if err != nil {
+		return request.Status(400).JSON(fiber.Map{"status": "error", "Message": "Invalid Jwt or 'token' not found in cookies"})
+	}
+	payload := token.Claims.(jwt.MapClaims)
+	claimsNew := jwt.MapClaims{
+		"id":    payload["id"].(string),
+		"name":  payload["name"].(string),
+		"email": payload["email"].(string),
+		"admin": payload["admin"].(bool),
+		"exp":   time.Now().Add(time.Hour * 24).Unix(),
+	}
+	// Create token
+	tokenNew := jwt.NewWithClaims(jwt.SigningMethodHS256, claimsNew)
+	// Generate encoded token and send it as response.
+	t, err := tokenNew.SignedString([]byte(config.Config("SECRET")))
+	if err != nil {
+		return request.SendStatus(fiber.StatusInternalServerError)
+	}
+	request.Cookie(&fiber.Cookie{
+		Name:  "token",
+		Value: t,
+	})
+	return request.Status(200).JSON(fiber.Map{"Message": "refresh success"})
+}
+
 func Login(request *fiber.Ctx) error {
 	db := database.DB
 	userGet := new(model.User)
@@ -63,6 +94,10 @@ func Login(request *fiber.Ctx) error {
 		}
 
 		request.Set("token", t)
+		request.Cookie(&fiber.Cookie{
+			Name:  "token",
+			Value: t,
+		})
 		return request.Status(200).JSON(fiber.Map{"Message": "Success Login"})
 	}
 }

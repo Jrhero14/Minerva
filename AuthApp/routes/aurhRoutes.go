@@ -14,6 +14,8 @@ func SetupNoteRoutes(router fiber.Router) {
 	auth.Post("/login", authHandler.Login)
 	// Create a User
 	auth.Post("/regis", authHandler.CreateUser)
+	// refresh token
+	auth.Get("/refresh", authHandler.Refresh)
 	// JWT Middleware
 	auth.Use(jwtware.New(jwtware.Config{
 		SigningKey: []byte(config.Config("SECRET")),
