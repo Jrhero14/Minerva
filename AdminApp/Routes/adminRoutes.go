@@ -28,4 +28,8 @@ func SetupNoteRoutes(router fiber.Router) {
 	admin.Get("/all-rak", adminHandler.GetAllRak)
 	// Create new Book
 	admin.Post("/create-book", adminHandler.CreateNewBook)
+	// Restock Book
+	admin.Post("/restock", adminHandler.RestockBook)
+	// All Books
+	admin.Get("all-book", adminHandler.AllBooks)
 }

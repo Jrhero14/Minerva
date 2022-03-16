@@ -101,6 +101,9 @@ func GetAllRak(request *fiber.Ctx) error {
 }
 
 func CreateNewBook(request *fiber.Ctx) error {
+	if !auth.CekRole(request) {
+		return request.Status(403).JSON(fiber.Map{"status": "Forbidden", "message": "Hanya Admin atau Manager yang bisa melihat semua user"})
+	}
 	db := database.DB
 	BookNew := new(model.Book)
 	bodyBook := new(schemas.BookBody)
@@ -139,4 +142,59 @@ func CreateNewBook(request *fiber.Ctx) error {
 		return request.Status(500).JSON(fiber.Map{"status": "error", "messsage": "Can't create new book"})
 	}
 	return request.Status(200).JSON(fiber.Map{"status": "success", "messsage": "Success Create Book", "data": BookNew})
+}
+
+func AllBooks(request *fiber.Ctx) error {
+	if !auth.CekRole(request) {
+		return request.Status(403).JSON(fiber.Map{"status": "Forbidden", "message": "Hanya Admin atau Manager yang bisa melihat semua user"})
+	}
+	db := database.DB
+	var Books []model.Book
+	err := db.Preload("IDJenis").Preload("IDKategori").Find(&Books).Error
+	if err != nil {
+		return request.Status(404).JSON(fiber.Map{"status": "error", "message": "not found books"})
+	}
+	return request.Status(200).JSON(fiber.Map{"status": "sucess", "message": "found books", "data": Books})
+}
+
+func RestockBook(request *fiber.Ctx) error {
+	if !auth.CekRole(request) {
+		return request.Status(403).JSON(fiber.Map{"status": "Forbidden", "message": "Hanya Admin atau Manager yang bisa melihat semua user"})
+	}
+	db := database.DB
+	bodyRestock := new(schemas.Restock)
+	restock := new(model.InfoDetail)
+	var Book model.Book
+
+	err := request.BodyParser(&bodyRestock)
+	if err != nil {
+		return request.Status(400).JSON(fiber.Map{"status": "error", "message": "Review your input"})
+	}
+	var rak model.RakBuku
+	err = db.Find(&rak, "id = ?", bodyRestock.IdRak).Error
+	if err != nil {
+		return request.Status(404).JSON(fiber.Map{"status": "error", "message": "Can't find Rak Buku"})
+	}
+	err = db.Preload("IDJenis").Preload("IDKategori").Find(&Book, "id = ?", bodyRestock.IdBook).Error
+	if err != nil {
+		return request.Status(404).JSON(fiber.Map{"status": "error", "message": "Can't find Buku"})
+	}
+	restock.Id_Book = bodyRestock.IdBook
+	restock.NomorBuku = bodyRestock.NomorBuku
+	restock.Ready = true
+	restock.Id_Rak = bodyRestock.IdRak
+	restock.IDRak = rak
+	err = db.Create(&restock).Error
+	if err != nil {
+		return request.Status(500).JSON(fiber.Map{"status": "error", "message": "Can't create new Stock"})
+	}
+	Book.Stock += 1
+	Book.Ketersediaan = true
+	err = db.Save(&Book).Error
+	if err != nil {
+		return request.Status(500).JSON(fiber.Map{"status": "error", "message": "Can't Save Book"})
+	}
+
+	return request.Status(200).JSON(fiber.Map{"status": "success", "message": "yey new stock", "data": restock})
+
 }

@@ -97,7 +97,7 @@ type Book struct {
 	Title        string
 	JudulSeri    string
 	Penerbit     string
-	Deskripsi    string `gorm:"type:date"`
+	Deskripsi    string `gorm:"type:text"`
 	Id_Jenis     int
 	IDJenis      Jenis `gorm:"foreignkey:Id_Jenis;constraint:onUpdate:CASCADE,ondelete:CASCADE" json:"Jenis"`
 	Bahasa       string
