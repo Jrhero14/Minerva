@@ -32,4 +32,6 @@ func SetupNoteRoutes(router fiber.Router) {
 	admin.Post("/restock", adminHandler.RestockBook)
 	// All Books
 	admin.Get("all-book", adminHandler.AllBooks)
+	// Get Book Stocks
+	admin.Post("book-stocks", adminHandler.GetBookStock)
 }

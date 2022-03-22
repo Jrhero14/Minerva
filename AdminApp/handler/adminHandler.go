@@ -10,7 +10,7 @@ import (
 
 func CreateCategory(request *fiber.Ctx) error {
 	if !auth.CekRole(request) {
-		return request.Status(403).JSON(fiber.Map{"status": "Forbidden", "message": "Hanya Admin atau Manager yang bisa melihat semua user"})
+		return request.Status(403).JSON(fiber.Map{"status": "Forbidden", "message": "Hanya Admin atau Manager yang bisa mengakses"})
 	}
 	db := database.DB
 	newCategory := new(model.Kategori)
@@ -27,7 +27,7 @@ func CreateCategory(request *fiber.Ctx) error {
 
 func GetAllCategory(request *fiber.Ctx) error {
 	if !auth.CekRole(request) {
-		return request.Status(403).JSON(fiber.Map{"status": "Forbidden", "message": "Hanya Admin atau Manager yang bisa melihat semua user"})
+		return request.Status(403).JSON(fiber.Map{"status": "Forbidden", "message": "Hanya Admin atau Manager yang bisa mengakses"})
 	}
 
 	db := database.DB
@@ -42,7 +42,7 @@ func GetAllCategory(request *fiber.Ctx) error {
 
 func CreateJenis(request *fiber.Ctx) error {
 	if !auth.CekRole(request) {
-		return request.Status(403).JSON(fiber.Map{"status": "Forbidden", "message": "Hanya Admin atau Manager yang bisa melihat semua user"})
+		return request.Status(403).JSON(fiber.Map{"status": "Forbidden", "message": "Hanya Admin atau Manager yang bisa mengakses"})
 	}
 	db := database.DB
 	newJenis := new(model.Jenis)
@@ -59,7 +59,7 @@ func CreateJenis(request *fiber.Ctx) error {
 
 func GetAllJenis(request *fiber.Ctx) error {
 	if !auth.CekRole(request) {
-		return request.Status(403).JSON(fiber.Map{"status": "Forbidden", "message": "Hanya Admin atau Manager yang bisa melihat semua user"})
+		return request.Status(403).JSON(fiber.Map{"status": "Forbidden", "message": "Hanya Admin atau Manager yang bisa mengakses"})
 	}
 	db := database.DB
 	var allJenis []model.Jenis
@@ -72,7 +72,7 @@ func GetAllJenis(request *fiber.Ctx) error {
 
 func CreateRak(request *fiber.Ctx) error {
 	if !auth.CekRole(request) {
-		return request.Status(403).JSON(fiber.Map{"status": "Forbidden", "message": "Hanya Admin atau Manager yang bisa melihat semua user"})
+		return request.Status(403).JSON(fiber.Map{"status": "Forbidden", "message": "Hanya Admin atau Manager yang bisa mengakses"})
 	}
 	db := database.DB
 	rakbukuBody := new(model.RakBuku)
@@ -89,7 +89,7 @@ func CreateRak(request *fiber.Ctx) error {
 
 func GetAllRak(request *fiber.Ctx) error {
 	if !auth.CekRole(request) {
-		return request.Status(403).JSON(fiber.Map{"status": "Forbidden", "message": "Hanya Admin atau Manager yang bisa melihat semua user"})
+		return request.Status(403).JSON(fiber.Map{"status": "Forbidden", "message": "Hanya Admin atau Manager yang bisa mengakses"})
 	}
 	db := database.DB
 	var allRak []model.RakBuku
@@ -102,7 +102,7 @@ func GetAllRak(request *fiber.Ctx) error {
 
 func CreateNewBook(request *fiber.Ctx) error {
 	if !auth.CekRole(request) {
-		return request.Status(403).JSON(fiber.Map{"status": "Forbidden", "message": "Hanya Admin atau Manager yang bisa melihat semua user"})
+		return request.Status(403).JSON(fiber.Map{"status": "Forbidden", "message": "Hanya Admin atau Manager yang bisa mengakses"})
 	}
 	db := database.DB
 	BookNew := new(model.Book)
@@ -146,7 +146,7 @@ func CreateNewBook(request *fiber.Ctx) error {
 
 func AllBooks(request *fiber.Ctx) error {
 	if !auth.CekRole(request) {
-		return request.Status(403).JSON(fiber.Map{"status": "Forbidden", "message": "Hanya Admin atau Manager yang bisa melihat semua user"})
+		return request.Status(403).JSON(fiber.Map{"status": "Forbidden", "message": "Hanya Admin atau Manager yang bisa mengakses"})
 	}
 	db := database.DB
 	var Books []model.Book
@@ -159,7 +159,7 @@ func AllBooks(request *fiber.Ctx) error {
 
 func RestockBook(request *fiber.Ctx) error {
 	if !auth.CekRole(request) {
-		return request.Status(403).JSON(fiber.Map{"status": "Forbidden", "message": "Hanya Admin atau Manager yang bisa melihat semua user"})
+		return request.Status(403).JSON(fiber.Map{"status": "Forbidden", "message": "Hanya Admin atau Manager yang bisa mengakses"})
 	}
 	db := database.DB
 	bodyRestock := new(schemas.Restock)
@@ -197,4 +197,22 @@ func RestockBook(request *fiber.Ctx) error {
 
 	return request.Status(200).JSON(fiber.Map{"status": "success", "message": "yey new stock", "data": restock})
 
+}
+
+func GetBookStock(request *fiber.Ctx) error {
+	db := database.DB
+	var stocks []model.InfoDetail
+	var body struct {
+		IdBook int
+	}
+
+	err := request.BodyParser(&body)
+	if err != nil {
+		return request.Status(400).JSON(fiber.Map{"status": "error", "message": "Review your input"})
+	}
+	db.Find(&stocks, "Id_Book = ?", body.IdBook).Preload("IDRak")
+	if len(stocks) == 0 {
+		return request.Status(500).JSON(fiber.Map{"status": "error", "message": "stock buku tersebut kosong"})
+	}
+	return request.Status(200).JSON(fiber.Map{"status": "success", "totalData": len(stocks), "data": stocks})
 }
