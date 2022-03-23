@@ -14,6 +14,7 @@ func SetupNoteRoutes(router fiber.Router) {
 	admin.Use(jwtware.New(jwtware.Config{
 		SigningKey: []byte(config.Config("SECRET")),
 	}))
+
 	// Create Category
 	admin.Post("/new-category", adminHandler.CreateCategory)
 	// All Category
@@ -31,7 +32,9 @@ func SetupNoteRoutes(router fiber.Router) {
 	// Restock Book
 	admin.Post("/restock", adminHandler.RestockBook)
 	// All Books
-	admin.Get("all-book", adminHandler.AllBooks)
+	admin.Get("/all-book", adminHandler.AllBooks)
 	// Get Book Stocks
-	admin.Post("book-stocks", adminHandler.GetBookStock)
+	admin.Post("/book-stocks", adminHandler.GetBookStock)
+	// get History Borrow Book
+	admin.Post("/history", adminHandler.GetHistoryBooked)
 }

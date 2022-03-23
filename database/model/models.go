@@ -114,6 +114,7 @@ type Book struct {
 type PreBooking struct {
 	gorm.Model
 	ID               int64 `gorm:"primary_key:auto_increment"`
+	IDBook           int64
 	Id_DetailBook    int64
 	IDInfoDetailBook InfoDetail `gorm:"foreignkey:Id_DetailBook;constraint:onUpdate:CASCADE,ondelete:SET NULL" json:"InfoDetail"`
 	Id_Member        uuid.UUID  `gorm:"type:uuid"`

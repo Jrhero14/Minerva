@@ -217,57 +217,60 @@ func CreateStock() {
 	var rakBuku2 model.RakBuku
 	db.Find(&rakBuku1, "id = ?", 2)
 	db.Find(&rakBuku2, "id = ?", 1)
-	var stock = []model.InfoDetail{
-		model.InfoDetail{
-			ID:        1,
-			Id_Book:   1,
-			NomorBuku: "LN1",
-			Ready:     true,
-			Id_Rak:    2,
-			IDRak:     rakBuku1,
-		},
-		{
-			ID:        2,
-			Id_Book:   1,
-			NomorBuku: "LN2",
-			Ready:     true,
-			Id_Rak:    2,
-			IDRak:     rakBuku1,
-		},
-		{
-			ID:        3,
-			Id_Book:   1,
-			NomorBuku: "LN3",
-			Ready:     true,
-			Id_Rak:    2,
-			IDRak:     rakBuku1,
-		},
-		{
-			ID:        4,
-			Id_Book:   2,
-			NomorBuku: "DS1",
-			Ready:     true,
-			Id_Rak:    1,
-			IDRak:     rakBuku2,
-		},
-		{
-			ID:        5,
-			Id_Book:   2,
-			NomorBuku: "DS2",
-			Ready:     true,
-			Id_Rak:    1,
-			IDRak:     rakBuku2,
-		},
-		{
-			ID:        6,
-			Id_Book:   2,
-			NomorBuku: "DS3",
-			Ready:     true,
-			Id_Rak:    1,
-			IDRak:     rakBuku2,
-		},
+	var stock1 = model.InfoDetail{
+		ID:        1,
+		Id_Book:   1,
+		NomorBuku: "LN1",
+		Ready:     true,
+		Id_Rak:    2,
+		IDRak:     rakBuku1,
 	}
-	db.Create(&stock)
+	var stock2 = model.InfoDetail{
+		ID:        2,
+		Id_Book:   1,
+		NomorBuku: "LN2",
+		Ready:     true,
+		Id_Rak:    2,
+		IDRak:     rakBuku1,
+	}
+	var stock3 = model.InfoDetail{
+		ID:        3,
+		Id_Book:   1,
+		NomorBuku: "LN3",
+		Ready:     true,
+		Id_Rak:    2,
+		IDRak:     rakBuku1,
+	}
+	var stock4 = model.InfoDetail{
+		ID:        4,
+		Id_Book:   2,
+		NomorBuku: "DS1",
+		Ready:     true,
+		Id_Rak:    1,
+		IDRak:     rakBuku2,
+	}
+	var stock5 = model.InfoDetail{
+		ID:        5,
+		Id_Book:   2,
+		NomorBuku: "DS2",
+		Ready:     true,
+		Id_Rak:    1,
+		IDRak:     rakBuku2,
+	}
+	var stock6 = model.InfoDetail{
+		ID:        6,
+		Id_Book:   2,
+		NomorBuku: "DS3",
+		Ready:     true,
+		Id_Rak:    1,
+		IDRak:     rakBuku2,
+	}
+	db.Create(&stock1)
+	db.Create(&stock2)
+	db.Create(&stock3)
+	db.Create(&stock4)
+	db.Create(&stock5)
+	db.Create(&stock6)
 
 	// update stock
 	var bookGet1 model.Book
@@ -283,6 +286,47 @@ func CreateStock() {
 	db.Save(&bookGet2)
 }
 
+func CreateBoooked() {
+	db := DB
+	var bookStock1 model.InfoDetail
+	db.Preload("IDRak").Find(&bookStock1, "id = ?", 3)
+	bookStock1.Ready = false
+	db.Save(&bookStock1)
+	var bookStock2 model.InfoDetail
+	db.Preload("IDRak").Find(&bookStock2, "id = ?", 4)
+	bookStock2.Ready = false
+	db.Save(&bookStock2)
+	var member model.Member
+	db.Find(&member, "nama = ?", "Udin Siawaludin")
+	var historyborrow model.HistoryBorrow
+	db.Find(&historyborrow, "id = ?", 1)
+	var prebookeds = []model.PreBooking{
+		model.PreBooking{
+			ID:               1,
+			IDBook:           bookStock1.Id_Book,
+			Id_DetailBook:    int64(bookStock1.ID),
+			IDInfoDetailBook: bookStock1,
+			Id_Member:        member.ID,
+			IDMember:         member,
+			Mobile:           true,
+			Borrowed:         false,
+			ExpireBorrow:     time.Now().AddDate(0, 0, 7),
+		},
+		{
+			ID:               2,
+			IDBook:           bookStock2.Id_Book,
+			Id_DetailBook:    int64(bookStock2.ID),
+			IDInfoDetailBook: bookStock2,
+			Id_Member:        member.ID,
+			IDMember:         member,
+			Mobile:           true,
+			Borrowed:         false,
+			ExpireBorrow:     time.Now().AddDate(0, 0, 7),
+		},
+	}
+	db.Create(&prebookeds)
+}
+
 func CreateDummy() {
 	CreateUserDefault()
 	CreateJenis()
@@ -290,6 +334,7 @@ func CreateDummy() {
 	CreateRak()
 	CreateBooks()
 	CreateStock()
+	CreateBoooked()
 }
 
 // ConnectDB connect to db

@@ -3,6 +3,7 @@ package handler
 import (
 	schemas "Minerva/AdminApp/schemas"
 	auth "Minerva/AuthApp/handler"
+	schemas2 "Minerva/AuthApp/schemas"
 	"Minerva/database"
 	"Minerva/database/model"
 	"github.com/gofiber/fiber/v2"
@@ -210,9 +211,28 @@ func GetBookStock(request *fiber.Ctx) error {
 	if err != nil {
 		return request.Status(400).JSON(fiber.Map{"status": "error", "message": "Review your input"})
 	}
-	db.Find(&stocks, "Id_Book = ?", body.IdBook).Preload("IDRak")
+	db.Preload("IDRak").Find(&stocks, "Id_Book = ?", body.IdBook)
 	if len(stocks) == 0 {
 		return request.Status(500).JSON(fiber.Map{"status": "error", "message": "stock buku tersebut kosong"})
 	}
 	return request.Status(200).JSON(fiber.Map{"status": "success", "totalData": len(stocks), "data": stocks})
 }
+
+func GetHistoryBooked(request *fiber.Ctx) error {
+	db := database.DB
+	var history []model.PreBooking
+	var body schemas2.BodyBorrowsBook
+	err := request.BodyParser(&body)
+	if err != nil {
+		return request.Status(400).JSON(fiber.Map{"status": "error", "message": "review your input body"})
+	}
+	db.Preload("IDInfoDetailBook").Preload("IDMember").Find(&history, "id_book = ?", body.IdBook)
+	return request.Status(200).JSON(fiber.Map{"data": history, "total": len(history)})
+}
+
+//func Booking(request *fiber.Ctx) error {
+//	db := database.DB
+//	Booking := new(model.PreBooking)
+//	var BookAvailable []model.InfoDetail
+//
+//}

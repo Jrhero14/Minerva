@@ -32,3 +32,7 @@ type RegSchema struct {
 	Password string
 	Role     string
 }
+
+type BodyBorrowsBook struct {
+	IdBook int
+}
