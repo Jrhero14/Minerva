@@ -23,3 +23,7 @@ type BookBody struct {
 	IdRak        int
 	IdKategori   int32
 }
+
+type DetailBook struct {
+	IdBook int
+}

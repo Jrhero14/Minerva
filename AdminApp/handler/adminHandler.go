@@ -151,11 +151,26 @@ func AllBooks(request *fiber.Ctx) error {
 	}
 	db := database.DB
 	var Books []model.Book
-	err := db.Preload("IDJenis").Preload("IDKategori").Find(&Books).Error
+	err := db.Find(&Books).Error
 	if err != nil {
 		return request.Status(404).JSON(fiber.Map{"status": "error", "message": "not found books"})
 	}
 	return request.Status(200).JSON(fiber.Map{"status": "sucess", "message": "found books", "data": Books})
+}
+
+func DetailBook(request *fiber.Ctx) error {
+	db := database.DB
+	var bodyQuery schemas.DetailBook
+	var Book model.Book
+	err := request.BodyParser(&bodyQuery)
+	if err != nil {
+		return request.Status(400).JSON(fiber.Map{"Message": "Review your input"})
+	}
+	db.Preload("IDJenis").Preload("IDKategori").Find(&Book, "id = ?", bodyQuery.IdBook)
+	if Book.Id_Jenis == 0 {
+		return request.Status(400).JSON(fiber.Map{"Message": "Can't Found book"})
+	}
+	return request.Status(200).JSON(fiber.Map{"Message": "Success", "data": Book})
 }
 
 func RestockBook(request *fiber.Ctx) error {
@@ -226,7 +241,7 @@ func GetHistoryBooked(request *fiber.Ctx) error {
 	if err != nil {
 		return request.Status(400).JSON(fiber.Map{"status": "error", "message": "review your input body"})
 	}
-	db.Preload("IDInfoDetailBook").Preload("IDMember").Find(&history, "id_book = ?", body.IdBook)
+	db.Preload("IDMember").Find(&history, "id_book = ?", body.IdBook)
 	return request.Status(200).JSON(fiber.Map{"data": history, "total": len(history)})
 }
 

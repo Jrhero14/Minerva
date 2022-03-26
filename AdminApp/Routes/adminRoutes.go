@@ -37,4 +37,6 @@ func SetupNoteRoutes(router fiber.Router) {
 	admin.Post("/book-stocks", adminHandler.GetBookStock)
 	// get History Borrow Book
 	admin.Post("/history", adminHandler.GetHistoryBooked)
+	// Get Detail One Book
+	admin.Post("/detail-book", adminHandler.DetailBook)
 }
