@@ -1,8 +1,8 @@
 package routes
 
 import (
-	authHandler "Minerva/AuthApp/handler"
-	"Minerva/config"
+	authHandler "github.com/Jrhero14/Minerva/AuthApp/handler"
+	"github.com/Jrhero14/Minerva/config"
 	"github.com/gofiber/fiber/v2"
 	jwtware "github.com/gofiber/jwt/v3"
 )

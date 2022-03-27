@@ -1,11 +1,11 @@
 package handler
 
 import (
-	schemas "Minerva/AdminApp/schemas"
-	auth "Minerva/AuthApp/handler"
-	schemas2 "Minerva/AuthApp/schemas"
-	"Minerva/database"
-	"Minerva/database/model"
+	schemas "github.com/Jrhero14/Minerva/AdminApp/schemas"
+	auth "github.com/Jrhero14/Minerva/AuthApp/handler"
+	schemas2 "github.com/Jrhero14/Minerva/AuthApp/schemas"
+	"github.com/Jrhero14/Minerva/database"
+	"github.com/Jrhero14/Minerva/database/model"
 	"github.com/gofiber/fiber/v2"
 )
 

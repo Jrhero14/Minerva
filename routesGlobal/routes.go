@@ -1,8 +1,8 @@
 package routesGlobal
 
 import (
-	adminRoutes "Minerva/AdminApp/Routes"
-	authRoutes "Minerva/AuthApp/routes"
+	adminRoutes "github.com/Jrhero14/Minerva/AdminApp/Routes"
+	authRoutes "github.com/Jrhero14/Minerva/AuthApp/routes"
 	"github.com/gofiber/fiber/v2"
 )
 

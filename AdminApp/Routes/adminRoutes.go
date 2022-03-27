@@ -1,8 +1,8 @@
 package Routes
 
 import (
-	adminHandler "Minerva/AdminApp/handler"
-	"Minerva/config"
+	adminHandler "github.com/Jrhero14/Minerva/AdminApp/handler"
+	"github.com/Jrhero14/Minerva/config"
 	"github.com/gofiber/fiber/v2"
 	jwtware "github.com/gofiber/jwt/v3"
 )

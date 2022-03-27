@@ -1,4 +1,4 @@
-module Minerva
+module github.com/Jrhero14/Minerva
 
 go 1.17
 

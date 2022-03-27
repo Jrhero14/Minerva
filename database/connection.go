@@ -1,9 +1,9 @@
 package database
 
 import (
-	"Minerva/config"
-	"Minerva/database/model"
 	"fmt"
+	"github.com/Jrhero14/Minerva/config"
+	"github.com/Jrhero14/Minerva/database/model"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/driver/postgres"

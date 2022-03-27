@@ -1,11 +1,11 @@
 package handler
 
 import (
-	schemas "Minerva/AuthApp/schemas"
-	"Minerva/config"
-	"Minerva/database"
-	"Minerva/database/model"
 	"fmt"
+	schemas "github.com/Jrhero14/Minerva/AuthApp/schemas"
+	"github.com/Jrhero14/Minerva/config"
+	"github.com/Jrhero14/Minerva/database"
+	"github.com/Jrhero14/Minerva/database/model"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
