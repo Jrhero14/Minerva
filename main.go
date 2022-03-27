@@ -1,8 +1,8 @@
 package main
 
 import (
-	"Minerva/database"
-	"Minerva/routesGlobal"
+	"github.com/Jrhero14/Minerva/database"
+	"github.com/Jrhero14/Minerva/routesGlobal"
 	"github.com/gofiber/fiber/v2"
 	"os"
 )
