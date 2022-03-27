@@ -1,6 +1,6 @@
 module github.com/Jrhero14/Minerva
 
-go 1.17
+go 1.12
 
 require (
 	github.com/gofiber/fiber/v2 v2.28.0
@@ -8,7 +8,7 @@ require (
 	github.com/golang-jwt/jwt/v4 v4.3.0
 	github.com/google/uuid v1.3.0
 	github.com/joho/godotenv v1.4.0
-	golang.org/x/crypto v0.0.0-20220112180741-5e0467b6c7ce
+	golang.org/x/crypto v0.0.0-20220214200702-86341886e292
 	gorm.io/driver/postgres v1.3.1
 	gorm.io/gorm v1.23.2
 )
