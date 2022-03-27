@@ -20,9 +20,9 @@ func main() {
 	// Listen on PORT 3000
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "8000"
 	}
-	errListen := app.Listen(":8080")
+	errListen := app.Listen(":" + port)
 	if errListen != nil {
 		os.Exit(1)
 	}
