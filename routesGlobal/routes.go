@@ -15,9 +15,9 @@ func SetupRoutes(app *fiber.App) {
 		Next:             nil,
 		AllowOrigins:     "*",
 		AllowMethods:     "GET,POST,HEAD,PUT,DELETE,PATCH",
-		AllowHeaders:     "*",
+		AllowHeaders:     "",
 		AllowCredentials: true,
-		ExposeHeaders:    "*",
+		ExposeHeaders:    "",
 		MaxAge:           0,
 	}))
 	authRoutes.SetupNoteRoutes(api)
