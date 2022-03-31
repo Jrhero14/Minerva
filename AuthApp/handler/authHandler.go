@@ -66,7 +66,7 @@ func Login(request *fiber.Ctx) error {
 	password := loginBody.Password
 	db.Preload("IdMember").Find(&userGet, "username = ?", username)
 	if userGet.ID == uuid.Nil {
-		return request.Status(404).JSON(fiber.Map{"status": "bad request", "message": "Wrong password or username"})
+		return request.Status(400).JSON(fiber.Map{"status": "bad request", "message": "Wrong password or username"})
 	}
 	err = bcrypt.CompareHashAndPassword(userGet.Hash, []byte(password))
 	if err != nil {
