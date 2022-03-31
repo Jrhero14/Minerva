@@ -52,7 +52,7 @@ func Refresh(request *fiber.Ctx) error {
 		Name:  "token",
 		Value: t,
 	})
-	return request.Status(200).JSON(fiber.Map{"Message": "refresh success"})
+	return request.Status(200).JSON(fiber.Map{"Message": "refresh success", "token": t})
 }
 
 func Login(request *fiber.Ctx) error {
@@ -99,7 +99,7 @@ func Login(request *fiber.Ctx) error {
 			Name:  "token",
 			Value: t,
 		})
-		return request.Status(200).JSON(fiber.Map{"Message": "Success Login"})
+		return request.Status(200).JSON(fiber.Map{"Message": "Success Login", "token": t})
 	}
 }
 
