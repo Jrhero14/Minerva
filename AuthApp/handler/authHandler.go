@@ -66,11 +66,11 @@ func Login(request *fiber.Ctx) error {
 	password := loginBody.Password
 	db.Preload("IdMember").Find(&userGet, "username = ?", username)
 	if userGet.ID == uuid.Nil {
-		return request.Status(404).JSON(fiber.Map{"status": "Not Found", "message": "user or password wrong"})
+		return request.Status(404).JSON(fiber.Map{"status": "bad request", "message": "Wrong password or username"})
 	}
 	err = bcrypt.CompareHashAndPassword(userGet.Hash, []byte(password))
 	if err != nil {
-		return request.JSON(fiber.Map{"status": "success", "message": "Error Hash Compare", "data": err})
+		return request.Status(400).JSON(fiber.Map{"status": "bad request", "message": "Wrong password or username", "data": err})
 	} else {
 		var admin bool
 		if userGet.Role == "User" {
