@@ -47,6 +47,7 @@ func Refresh(request *fiber.Ctx) error {
 	if err != nil {
 		return request.SendStatus(fiber.StatusInternalServerError)
 	}
+	request.Set("token", t)
 	request.Cookie(&fiber.Cookie{
 		Name:  "token",
 		Value: t,
