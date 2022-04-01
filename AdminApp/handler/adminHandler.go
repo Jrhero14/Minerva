@@ -7,6 +7,8 @@ import (
 	"github.com/Jrhero14/Minerva/database"
 	"github.com/Jrhero14/Minerva/database/model"
 	"github.com/gofiber/fiber/v2"
+	"math/rand"
+	"time"
 )
 
 func CreateCategory(request *fiber.Ctx) error {
@@ -173,13 +175,28 @@ func DetailBook(request *fiber.Ctx) error {
 	return request.Status(200).JSON(fiber.Map{"Message": "Success", "data": Book})
 }
 
+const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+var seededRand *rand.Rand = rand.New(
+	rand.NewSource(time.Now().UnixNano()))
+
+func StringWithCharset(length int, charset string) string {
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = charset[seededRand.Intn(len(charset))]
+	}
+	return string(b)
+}
+func String(length int) string {
+	return StringWithCharset(length, charset)
+}
+
 func RestockBook(request *fiber.Ctx) error {
 	if !auth.CekRole(request) {
 		return request.Status(403).JSON(fiber.Map{"status": "Forbidden", "message": "Hanya Admin atau Manager yang bisa mengakses"})
 	}
 	db := database.DB
 	bodyRestock := new(schemas.Restock)
-	restock := new(model.InfoDetail)
 	var Book model.Book
 
 	err := request.BodyParser(&bodyRestock)
@@ -195,23 +212,27 @@ func RestockBook(request *fiber.Ctx) error {
 	if err != nil {
 		return request.Status(404).JSON(fiber.Map{"status": "error", "message": "Can't find Buku"})
 	}
-	restock.Id_Book = bodyRestock.IdBook
-	restock.NomorBuku = bodyRestock.NomorBuku
-	restock.Ready = true
-	restock.Id_Rak = bodyRestock.IdRak
-	restock.IDRak = rak
-	err = db.Create(&restock).Error
-	if err != nil {
-		return request.Status(500).JSON(fiber.Map{"status": "error", "message": "Can't create new Stock"})
+
+	for i := 0; i < bodyRestock.Jumlah; i++ {
+		restock := new(model.InfoDetail)
+		restock.Id_Book = bodyRestock.IdBook
+		restock.NomorBuku = String(5)
+		restock.Ready = true
+		restock.Id_Rak = bodyRestock.IdRak
+		restock.IDRak = rak
+		err = db.Create(&restock).Error
+		if err != nil {
+			return request.Status(500).JSON(fiber.Map{"status": "error", "message": "Can't create new Stock"})
+		}
 	}
-	Book.Stock += 1
+	Book.Stock += int32(bodyRestock.Jumlah)
 	Book.Ketersediaan = true
 	err = db.Save(&Book).Error
 	if err != nil {
 		return request.Status(500).JSON(fiber.Map{"status": "error", "message": "Can't Save Book"})
 	}
 
-	return request.Status(200).JSON(fiber.Map{"status": "success", "message": "yey new stock", "data": restock})
+	return request.Status(200).JSON(fiber.Map{"status": "success", "message": "yey new stock"})
 
 }
 

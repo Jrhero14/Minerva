@@ -1,9 +1,9 @@
 package schemas
 
 type Restock struct {
-	IdBook    int64
-	NomorBuku string
-	IdRak     int
+	IdBook int64
+	Jumlah int
+	IdRak  int
 }
 
 type BookBody struct {

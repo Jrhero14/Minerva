@@ -39,7 +39,7 @@ type Member struct {
 
 type Mylist struct {
 	gorm.Model
-	ID       int64 `gorm:"primary_key:auto_increment"`
+	ID       int64 `gorm:"primary_key:autoIncrement"`
 	NameList string
 	IDMember uuid.UUID `gorm:"type:uuid"`
 	Books    []*Book   `gorm:"many2many:mylist_books;" json:"Books"`
@@ -47,14 +47,14 @@ type Mylist struct {
 
 type HistoryBorrow struct {
 	gorm.Model
-	ID          int64         `gorm:"primary_key:auto_increment"`
+	ID          int64         `gorm:"primary_key:autoIncrement"`
 	IDMember    uuid.UUID     `gorm:"type:uuid"`
 	Prebookings []*PreBooking `gorm:"many2many:historyborrow_prebookings;" json:"Booked"`
 }
 
 type Favorite struct {
 	gorm.Model
-	ID        int64     `gorm:"primary_key:auto_increment"`
+	ID        int64     `gorm:"primary_key:autoIncrement"`
 	Id_Member uuid.UUID `gorm:"type:uuid"`
 	Books     []*Book   `gorm:"many2many:favorite_books;" json:"Books"`
 }
@@ -62,13 +62,13 @@ type Favorite struct {
 // Book Entity
 type Jenis struct {
 	gorm.Model
-	ID        int `gorm:"primary_key:auto_increment"`
+	ID        int `gorm:"primary_key:autoIncrement"`
 	NamaJenis string
 }
 
 type RakBuku struct {
 	gorm.Model
-	ID       int32 `gorm:"primary_key:auto_increment"`
+	ID       int32 `gorm:"primary_key:autoIncrement"`
 	NamaRak  string
 	NomorRak string
 	Note     string `gorm:"type:text"`
@@ -76,7 +76,7 @@ type RakBuku struct {
 
 type InfoDetail struct {
 	gorm.Model
-	ID        int32 `gorm:"primary_key:auto_increment"`
+	ID        int32 `gorm:"primaryKey;autoIncrement" json:"id"`
 	Id_Book   int64
 	NomorBuku string
 	Id_Rak    int
@@ -86,13 +86,13 @@ type InfoDetail struct {
 
 type Kategori struct {
 	gorm.Model
-	ID           int32 `gorm:"primary_key:auto_increment"`
+	ID           int32 `gorm:"primary_key:autoIncrement"`
 	NamaKategori string
 }
 
 type Book struct {
 	gorm.Model
-	ID           int64 `gorm:"primary_key:auto_increment"`
+	ID           int64 `gorm:"primary_key:autoIncrement"`
 	Image        string
 	Title        string
 	JudulSeri    string
@@ -113,7 +113,7 @@ type Book struct {
 // Borrow Entity
 type PreBooking struct {
 	gorm.Model
-	ID               int64 `gorm:"primary_key:auto_increment"`
+	ID               int64 `gorm:"primary_key:autoIncrement"`
 	IDBook           int64
 	Id_DetailBook    int64
 	IDInfoDetailBook InfoDetail `gorm:"foreignkey:Id_DetailBook;constraint:onUpdate:CASCADE,ondelete:SET NULL" json:"InfoDetail"`
@@ -126,7 +126,7 @@ type PreBooking struct {
 
 type Booked struct {
 	gorm.Model
-	ID               int64 `gorm:"primary_key:auto_increment"`
+	ID               int64 `gorm:"primary_key:autoIncrement"`
 	Id_DetailBook    int64
 	IDInfoDetailBook InfoDetail `gorm:"foreignkey:Id_DetailBook;constraint:onUpdate:CASCADE,ondelete:SET NULL" json:"InfoDetail"`
 	Id_Member        uuid.UUID  `gorm:"type:uuid"`
