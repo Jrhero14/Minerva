@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	schemas "github.com/Jrhero14/Minerva/AdminApp/schemas"
 	auth "github.com/Jrhero14/Minerva/AuthApp/handler"
 	schemas2 "github.com/Jrhero14/Minerva/AuthApp/schemas"
@@ -266,9 +267,83 @@ func GetHistoryBooked(request *fiber.Ctx) error {
 	return request.Status(200).JSON(fiber.Map{"data": history, "total": len(history)})
 }
 
-//func Booking(request *fiber.Ctx) error {
-//	db := database.DB
-//	Booking := new(model.PreBooking)
-//	var BookAvailable []model.InfoDetail
-//
-//}
+func Booking(request *fiber.Ctx) error {
+	db := database.DB
+	Body := new(schemas.BookingBody)
+	var BOOKING model.Booked
+	var BookAvailable model.InfoDetail
+	var User model.User
+	err := request.BodyParser(&Body)
+	if err != nil {
+		return request.Status(400).JSON(fiber.Map{"status": "error", "message": "review your input body"})
+	}
+
+	db.Preload("IdMember").Find(&User, "ID = ?", Body.IdUser)
+	BOOKING.Id_Member = User.IdMem
+	BOOKING.IDMember = User.IdMember
+
+	db.Find(&BookAvailable, "Id_Book = ?", Body.IdBuku)
+	BOOKING.Id_DetailBook = int64(BookAvailable.ID)
+	BOOKING.IDInfoDetailBook = BookAvailable
+	BOOKING.Mobile = true
+	BOOKING.Borrowed = false
+	BOOKING.ExpireReturn = time.Now().Add(time.Hour * 24 * 3)
+	err = db.Create(&BOOKING).Error
+	if err != nil {
+		return request.Status(500).JSON(fiber.Map{"status": "error", "message": "Can't Booking", "data": err})
+	}
+	return request.Status(200).JSON(fiber.Map{"status": "success", "message": "Berhasil Booking Buku", "data": BOOKING})
+}
+
+func FilterCategory(request *fiber.Ctx) error {
+	db := database.DB
+	fmt.Println(request.Query("category"))
+	idCategory := request.Query("category")
+	var Books []model.Book
+	db.Find(&Books, "Id_Kategori = ?", idCategory)
+	if len(Books) == 0 {
+		return request.Status(500).JSON(fiber.Map{"status": "error", "message": "Buku tidak ditemukan"})
+	}
+	return request.Status(200).JSON(fiber.Map{"status": "success", "message": "Berhasil mendapatkan buku", "data": Books})
+}
+
+func UpdateBook(request *fiber.Ctx) error {
+	db := database.DB
+	var body schemas.UpdateBookBody
+	var BookUpdate model.Book
+	err := request.BodyParser(&body)
+	if err != nil {
+		return request.Status(400).JSON(fiber.Map{"status": "error", "message": "review your input body"})
+	}
+	db.Find(&BookUpdate, "id = ?", body.IdBuku)
+	BookUpdate.Image = body.Image
+	BookUpdate.Title = body.Title
+	BookUpdate.JudulSeri = body.JudulSeri
+	BookUpdate.Penerbit = body.Penerbit
+	BookUpdate.Deskripsi = body.Deskripsi
+	BookUpdate.Id_Jenis = body.IdJenis
+	BookUpdate.Bahasa = body.Bahasa
+	BookUpdate.ISBN = body.ISBN
+	BookUpdate.Edisi = body.Edisi
+	BookUpdate.Subjek = body.Subjek
+	BookUpdate.Id_Kategori = body.IdKategori
+	db.Save(&BookUpdate)
+	return request.Status(200).JSON(fiber.Map{"status": "success", "message": "Berhasil mendapatkan buku", "data": BookUpdate})
+}
+
+func DeleteBook(request *fiber.Ctx) error {
+	db := database.DB
+	var Book model.Book
+	var body schemas.DeleteBookBody
+	err := request.BodyParser(&body)
+	if err != nil {
+		return request.Status(400).JSON(fiber.Map{"status": "error", "message": "review your input body"})
+	}
+	db.Find(&Book, "id = ?", body.IdBuku)
+	fmt.Println(Book.ID)
+	if Book.ID == 0 {
+		return request.Status(400).JSON(fiber.Map{"status": "error", "message": "Buku Tidak ditemukan"})
+	}
+	db.Delete(&Book)
+	return request.Status(400).JSON(fiber.Map{"status": "error", "message": "Delete book success"})
+}

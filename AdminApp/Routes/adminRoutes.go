@@ -39,4 +39,13 @@ func SetupNoteRoutes(router fiber.Router) {
 	admin.Post("/history", adminHandler.GetHistoryBooked)
 	// Get Detail One Book
 	admin.Post("/detail-book", adminHandler.DetailBook)
+
+	// Booking
+	admin.Post("/Booking", adminHandler.Booking)
+	// Book By Category
+	admin.Get("/filter-by-category", adminHandler.FilterCategory)
+	// Update Book
+	admin.Post("update-book", adminHandler.UpdateBook)
+	// Delete Book
+	admin.Delete("/delete-book", adminHandler.DeleteBook)
 }
